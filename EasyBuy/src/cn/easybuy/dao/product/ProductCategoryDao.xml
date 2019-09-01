@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.easybuy.dao.product.ProductCategoryDao">
+	<select id="queryProductCategorylist_Mybatis" parameterType="ProductCategoryParam" resultType="ProductCategory">
+		SELECT epc1.*,epc2.name as parentName FROM easybuy_product_category epc1 LEFT JOIN easybuy_product_category epc2 ON epc1.parentId=epc2.id where 1=1
+		<if test=" name != null and name !='' ">
+			and epc1.name like concat('%',#{name},'%')
+		</if>
+		<if test=" parentId !=null and parentId > 0">
+			and epc1.parentId = #{parentId}
+		</if>
+		<if test=" type !=null and type > 0">
+			 and epc1.type = #{type}
+		</if>
+		<if test="startIndex !=null and pageSize != null">
+			limit #{startIndex},#{pageSize}
+		</if>
+	</select>
+	
+	<select id="queryProductCategoryById_Mybatis" parameterType="int" resultType="ProductCategory">
+		SELECT id,name,parentId,type,iconClass  FROM easybuy_product_category where id = #{id}
+	</select>
+	
+	<select id="queryProductCategoryCount_Mybatis" parameterType="ProductCategoryParam" resultType="int">
+		SELECT count(*) count FROM easybuy_product_category where 1=1
+		<if test=" name != null and name !=''">
+			and name like concat('%',#{name},'%')
+		</if>
+		<if test="parentId !=null and parentId > 0">
+			and parentId = #{parentId}
+		</if>
+	</select>
+	
+	<insert id="add_Mybatis" parameterType="productCategory">
+		INSERT into easybuy_product_category(name,parentId,type,iconClass) 
+		values(#{name},#{parentId},#{type},#{iconClass})
+	</insert>
+	
+	<update id="update_Mybatis" parameterType="productCategory">
+		UPDATE easybuy_product_category SET name=#{name},
+		parentId=#{parentId},
+		type=#{type},
+		iconClass=#{iconClass}
+		WHERE id =#{id}
+	</update>
+	
+	<delete id="deleteById_Mybatis" parameterType="int">
+		delete from easybuy_product_category where id = #{parseLong}
+	</delete>
+</mapper>

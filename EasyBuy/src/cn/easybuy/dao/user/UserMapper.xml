@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.easybuy.dao.user.UserDao">
+	<select id="getUser_Mybatis" resultType="user">
+		select id,loginName,password,userName,sex,identityCode,email,mobile,type from easybuy_user where 1=1
+		<if test="name !=null and name !='' ">
+			and loginName= #{name}
+		</if>
+		<if test="id !=null">
+			 and id= #{id}
+		</if>
+	</select>
+	
+	<insert id="add_Mybatis" parameterType="user">
+		INSERT into easybuy_user(loginName,userName,password,sex,identityCode,email,mobile)
+		values(#{loginName},#{userName},#{password},#{sex},#{identityCode},#{email},#{mobile})
+	</insert>
+	
+	<update id="update_Mybatis">
+		UPDATE easybuy_user
+		SET loginName=#{loginName},
+		userName =#{userName},
+		type=#{type},
+		sex =#{sex},
+		identityCode =#{identityCode},
+		email =#{email},
+		mobile =#{mobile}
+		WHERE id =#{id} 	
+	</update>
+	
+	<delete id="deleteUserById_Mybatis" parameterType="string">
+		delete from easybuy_user where id = #{id}
+	</delete>
+	
+	<select id="getUserList_Mybatis" resultType="user">
+		select id,loginName,password,userName,sex,identityCode,email,mobile,type from easybuy_user where 1=1
+		limit  #{currentNo} , #{pageSize}
+	</select>
+	
+	<select id="count" resultType="int">
+		select count(*) count from easybuy_user where 1=1
+	</select>
+</mapper>

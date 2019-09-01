@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-3.2.xsd 
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context-3.2.xsd 
+	http://www.springframework.org/schema/aop 
+	http://www.springframework.org/schema/aop/spring-aop-3.2.xsd 
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx-3.2.xsd">
+
+	<context:component-scan base-package="cn.easybuy.service"/>
+	<aop:aspectj-autoproxy />
+	<!-- 配置数据源(使用属性方式) -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url"
+			value="jdbc:mysql://localhost:3306/easybuy?useUnicode=true&amp;characterEncoding=utf-8" />
+		<property name="username" value="root" />
+		<property name="password" value="root" />
+	</bean>
+
+	<!-- 配置sqlSessionFactoryBean -->
+	<bean id="sqlSessionFactoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!-- 配置数据原属性：引用数据源组件 -->
+		<property name="dataSource" ref="dataSource" />
+		<!-- 引用Mybatis配置文件的配置 -->
+		<!-- <property name="configLocation" value="classpath:mybatis-config.xml"/> -->
+		<!-- 配置别名属性 -->
+		<property name="typeAliasesPackage" value="cn.easybuy.param,cn.easybuy.entity"/>
+		<!-- 配置映射文件属性 -->
+		<property name="mapperLocations">
+			<list>
+				<value>classpath:cn/easybuy/dao/**/*.xml</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 使用扫描器方式配置映射文件 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!-- 配置SQLSessionFactory -->
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactoryBean"/>
+		<!-- 指定包的路径，扫描器迭代扫描 -->
+		<property name="basePackage" value="cn.easybuy.dao" />
+	</bean>
+
+	<!-- 配置SqlSessionTemplate -->
+	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg name="sqlSessionFactory" ref="sqlSessionFactoryBean" />
+	</bean>
+
+	<!-- 定义事务管理器 -->
+	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<tx:annotation-driven transaction-manager="txManager" />
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<!-- 定义属性，声明事务规则 （对不同的方法设置不同的事务属性） -->
+	<!-- 	<tx:attributes>
+			<tx:method name="find*" propagation="SUPPORTS" />
+			<tx:method name="add*" propagation="REQUIRED" />
+			<tx:method name="del*" propagation="REQUIRED" />
+			<tx:method name="update*" propagation="REQUIRED" />
+			<tx:method name="*" propagation="REQUIRED" />
+		</tx:attributes> -->
+	</tx:advice>
+	<!-- 定义切面 -->
+	<aop:config>
+		<!-- 定义切入点 -->
+		<aop:pointcut id="serviceMethod" expression="execution(* cn.easybuy.service..*.*(..))" />
+		<!-- 将事务增强与切入点组合 -->
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="serviceMethod" />
+	</aop:config>
+</beans>

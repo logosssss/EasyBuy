@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.easybuy.dao.news.NewsDao">
+	<insert id="add_Mybatis" parameterType="News">
+		INSERT into easybuy_news(title,content,createTime) 
+		values( #{title}, #{content}, #{createTime})
+	</insert>
+	<update id="update_Mybatis" parameterType="News">
+		update easybuy_news set title=#{title},content=#{content} where id= #{id}
+	</update>
+	
+	<delete id="deleteById_Mybatis" parameterType="int">
+		delete from easybuy_news where id = #{id}
+	</delete>
+	
+	<select id="getNewsById_Mybatis" parameterType="int" resultType="News">
+		 select * from easybuy_news where id = #{id}
+	</select>
+	
+	<select id="queryNewsList_Mybatis" parameterType="NewsParams" resultType="News">
+		select id,title,content,createTime FROM easybuy_news where 1=1
+		<if test="title !=null and title !='' ">
+			and title like concat('%',#{title},'%')
+		</if>
+		<if test="sort != null and sort != '' ">
+			order by sort
+		</if>
+		<if test="startIndex !=null and pageSize !=null">
+			limit #{startIndex},#{pageSize}
+		</if>
+	</select>
+	
+	<select id="queryNewsCount_Mybatis" resultType="int" parameterType="NewsParams">
+		select count(*) as count FROM easybuy_news where 1=1
+		<if test="title != null and title != '' ">
+			and title like concat('%',#{title},'%')
+		</if>
+	</select>
+</mapper>

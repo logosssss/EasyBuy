@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.easybuy.dao.product.ProductDao">
+	<select id="getProductById_MyBatis" parameterType="int" resultType="Product">
+		select id,name,description,price,stock,categoryLevel1Id,categoryLevel2Id,categoryLevel3Id,fileName,isDelete from easybuy_product where id = #{productId}
+	</select>
+	
+	<select id="getProductList_Mybatis" resultType="Product">
+		select id,name,description,price,stock,categoryLevel1Id,categoryLevel2Id,categoryLevel3Id,fileName,isDelete from easybuy_product  where 1=1
+		<if test="proName !=null and proName != ''">
+			and name like concat('%',#{proName},'%')
+		</if>
+		<if test="categoryId !=null">
+			and (categoryLevel1Id = #{categoryId} or categoryLevel2Id=#{categoryId} or categoryLevel3Id=#{categoryId} )
+		</if>
+		<if test="currentNo !=null and pageSize != null">
+			limit #{currentNo},#{pageSize}
+		</if>
+	</select>
+	
+	<insert id="add_Mybatis" parameterType="Product">
+		insert into easybuy_product(name,description,price,stock,categoryLevel1Id,categoryLevel2Id,categoryLevel3Id,fileName,isDelete) 
+		values(#{name},
+		#{description},
+		#{price},
+		#{stock},
+		#{categoryLevel1Id},
+		#{categoryLevel2Id},
+		#{categoryLevel3Id},
+		#{fileName},
+		0)
+	</insert>
+	
+	<update id="update_Mybatis" parameterType="Product">
+		update easybuy_product set 
+		name=#{name},fileName=#{fileName},categoryLevel1Id=#{categoryLevel1Id},
+		categoryLevel2Id=#{categoryLevel2Id},categoryLevel3Id=#{categoryLevel3Id} where id=#{id}
+	</update>
+	
+	<select id="queryProductCount_Mybatis" resultType="int">
+		select count(*) count from easybuy_product where 1=1
+		<if test="proName !=null and proName !=''">
+			and name like concat('%',proName,'%')
+		</if>
+		<if test="categoryId != null">
+			and (categoryLevel1Id = #{categoryId} or categoryLevel2Id=#{categoryId} or categoryLevel3Id=#{categoryId} )
+		</if>
+	</select>
+	
+	<delete id="deleteProductById_Mybatis" parameterType="int">
+		delete from easybuy_product where id = #{productId}
+	</delete>
+	
+	<update id="updateStock_Mybatis">
+		update easybuy_product set stock=#{quantity} where id=#{id}
+	</update>
+</mapper>

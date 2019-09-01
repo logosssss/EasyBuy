@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.easybuy.dao.order.OrderDao">
+	<insert id="add_Mybatis" parameterType="Order">
+		insert into easybuy_order(userId,loginName,userAddress,createTime,cost,serialNumber) 
+		values(#{userId},
+		#{loginName},
+		#{userAddress},
+		#{createTime},
+		#{cost},
+		#{serialNumber})
+	</insert>
+	
+	<delete id="deleteById_Mybatis" parameterType="int">
+		delete from easybuy_order where id = #{id}
+	</delete>
+	
+	<select id="getOrderById_Mybatis" parameterType="int" resultType="Order">
+		select * from easybuy_order where id = #{id}
+	</select>
+	
+	<select id="getOrderList_Mybatis" resultType="Order" parameterType="int">
+		select id,userId,loginName,userAddress,createTime,cost,serialNumber from easybuy_order  where 1=1
+		<if test="userId !=null">
+			and userId = #{userId}
+		</if>
+		<if test="currentNo != null and pageSize != null">
+			limit #{currentNo},#{pageSize}
+		</if>
+	</select>
+	
+	<select id="count_Mybatis" parameterType="int" resultType="int">
+		select count(id) count from easybuy_order  where 1=1
+		<if test="userId != null">
+			and userId = #{userId}
+		</if>
+	</select>
+	
+	<select id="getOrderid" resultType="int">
+		SELECT id FROM `easybuy_order` ORDER BY `id` DESC 
+		LIMIT 0,1
+	</select>
+</mapper>
